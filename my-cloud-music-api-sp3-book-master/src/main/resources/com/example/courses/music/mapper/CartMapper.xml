@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"  >
+<mapper namespace="com.example.courses.music.mapper.CartMapper">
+    <!--列表查询结果-->
+    <resultMap id="listResult" autoMapping="true" type="com.example.courses.music.model.Cart">
+        <id column="id" property="id"/>
+
+        <!--商品-->
+        <association property="product" javaType="com.example.courses.music.model.Product">
+
+        </association>
+    </resultMap>
+
+    <!--查询sql-->
+    <sql id="select">
+        select `cart`.id,
+               `cart`.count,
+               `cart`.created_at,
+               `cart`.updated_at,
+
+               product.id    as "product.id",
+               product.title as "product.title",
+               product.price as "product.price",
+               product.icon  as "product.icon"
+
+        from `cart`
+                 inner join product on `cart`.product_id = product.id
+    </sql>
+
+    <!--根据用户id查询-->
+    <select id="findByUserId" resultType="com.example.courses.music.model.Cart">
+        <include refid="select"></include>
+
+        where `cart`.user_id = #{data}
+        order by `cart`.created_at desc
+    </select>
+
+    <!--根据id查询-->
+    <select id="findByIds" resultMap="listResult">
+        <include refid="select"></include>
+
+        where `cart`.id in
+        <foreach item="item" index="index" collection="data"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        order by `cart`.created_at desc
+    </select>
+
+</mapper>

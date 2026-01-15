@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"  >
+<mapper namespace="com.example.courses.music.mapper.UserMapper">
+    <!--其他表用户结果映射-->
+    <resultMap id="user" type="com.example.courses.music.model.User">
+        <id column="user_id" property="id"/>
+        <result column="user_nickname" property="nickname"/>
+        <result column="user_icon" property="icon"/>
+    </resultMap>
+
+    <!--通用其他表用户查询列sql-->
+    <sql id="user_column">
+        user.id as user_id,user.nickname as user_nickname,user.icon as user_icon
+    </sql>
+
+    <!--用户关注的人（好友）-->
+    <select id="following" resultType="com.example.courses.music.model.User">
+        select
+            user.id as id,
+
+            nickname,
+            icon,
+            detail
+        from friend
+                 inner join user on friend.followed_id = user.id
+        where friend.follower_id = #{data}
+    </select>
+
+    <!--关注用户（我）的人（粉丝）-->
+    <select id="followers" resultType="com.example.courses.music.model.User">
+        select
+            user.id as id,
+
+            nickname,
+            icon,
+            detail
+        from friend
+                 inner join user on friend.follower_id = user.id
+        where friend.followed_id = #{data}
+    </select>
+
+    <!--用户搜索-->
+    <select id="search" resultType="com.example.courses.music.model.User">
+        select
+
+        id,
+        nickname,
+        icon,
+        detail,
+        created_at
+
+        from `user`
+
+        <where>
+            <if test="query != null">
+                nickname like '%${query}%'
+                or detail like '%${query}%'
+            </if>
+        </where>
+
+        order by created_at desc
+    </select>
+
+    <!--搜索建议-->
+    <select id="suggest" resultType="com.example.courses.music.model.SuggestItem">
+        select
+
+        id,
+        nickname as title
+
+        from `user`
+
+        <where>
+            <if test="query != null">
+                nickname like '%${query}%'
+            </if>
+        </where>
+        order by created_at desc
+        limit 10 offset 0
+    </select>
+</mapper>

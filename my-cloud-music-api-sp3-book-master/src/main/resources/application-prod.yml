@@ -1,0 +1,7 @@
+#正式环境配置文件
+
+##日志配置
+logging:
+  level:
+    #打印warn以及以上级别日志
+    root: warn

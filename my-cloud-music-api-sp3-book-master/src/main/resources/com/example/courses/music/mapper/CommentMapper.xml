@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"  >
+<mapper namespace="com.example.courses.music.mapper.CommentMapper">
+    <!--评论列表-->
+    <select id="findAll" resultType="com.example.courses.music.model.Comment">
+        select
+        c.id,
+        c.content,
+        c.media,
+        c.likes_count,
+        c.created_at,
+        c.updated_at,
+
+        u.id as "user.id",
+        u.nickname as "user.nickname",
+        u.icon as "user.icon",
+
+        parent.id as "parent.id",
+        parent.content as "parent.content",
+
+        parent_user.id as "parent.user.id",
+        parent_user.nickname as "parent.user.nickname",
+        parent_user.icon as "parent.user.icon",
+
+        sheet.id as "sheet.id",
+        sheet.title as "sheet.title",
+
+        sheet_user.id as "sheet.user.id",
+        sheet_user.nickname as "sheet.user.nickname",
+        sheet_user.icon as "sheet.user.icon"
+
+        from comment as c
+        inner join user as u on c.user_id = u.id
+        left join comment as parent on parent.id = c.parent_id
+        left join user as parent_user on parent.user_id = parent_user.id
+        left join sheet on c.sheet_id = sheet.id
+        left join user as sheet_user on sheet.user_id = sheet_user.id
+
+        <!--where标签的好处是
+        如果map为空
+        生成的sql他不会有where-->
+        <where>
+            <foreach collection="conditions.entrySet()" index="key" item="value" separator="and">
+                ${key} = ${value}
+            </foreach>
+        </where>
+
+        order by ${orderField} ${order}
+    </select>
+</mapper>

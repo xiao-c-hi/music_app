@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"  >
+<mapper namespace="com.example.courses.music.mapper.SheetMapper">
+    <!--歌单查询结果-->
+    <resultMap id="sheetResult" autoMapping="true" type="com.example.courses.music.model.Sheet">
+        <id column="id" property="id"/>
+
+        <!--用户-->
+        <association property="user" resultMap="com.example.courses.music.mapper.UserMapper.user">
+
+        </association>
+
+        <!--标签列表-->
+        <collection property="tags" ofType="com.example.courses.music.model.Tag">
+            <id column="tag_id" property="id"></id>
+            <result column="tag_title" property="title"/>
+        </collection>
+    </resultMap>
+
+    <!--歌单查询通用sql-->
+    <sql id="sheetSelect">
+        select
+        sheet.id,
+        sheet.title,
+        sheet.detail,
+        sheet.icon,
+        sheet.clicks_count,
+        sheet.collects_count,
+        sheet.comments_count,
+        sheet.created_at,
+        sheet.updated_at,
+
+        <include refid="com.example.courses.music.mapper.UserMapper.user_column"></include>
+    </sql>
+
+    <select id="findDetail" resultMap="sheetResult">
+            <include refid="sheetSelect"></include>,
+
+            tag.id as tag_id,
+            tag.title as tag_title
+
+        from sheet
+                 inner join `user` on sheet.user_id = `user`.id
+                 left join label on sheet.id=label.sheet_id
+                 left join tag on tag.id = label.tag_id
+        where sheet.id = #{data}
+    </select>
+
+    <!--查询用户收藏的歌单-->
+    <select id="findCollectByUserId" resultMap="sheetResult">
+        <include refid="sheetSelect"></include>
+
+        from collect
+        left join sheet on collect.sheet_id = sheet.id
+        left join user on sheet.user_id = user.id
+        where collect.user_id = #{data}
+        order by sheet.created_at desc
+    </select>
+
+    <!--搜索建议-->
+    <select id="suggest" resultType="com.example.courses.music.model.SuggestItem">
+        select
+
+        id,
+        title
+
+        from sheet
+
+        <where>
+            <if test="query != null">
+                title like '%${query}%'
+            </if>
+        </where>
+        order by created_at desc
+        limit 10 offset 0
+    </select>
+</mapper>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"  >
+<mapper namespace="com.example.courses.music.mapper.OrderMapper">
+    <!--订单查询sql-->
+    <sql id="order_select">
+        select `order`.id,
+               `order`.status,
+               `order`.price,
+               `order`.source,
+               `order`.origin,
+               `order`.channel,
+               `order`.number,
+               `order`.other,
+               `order`.product,
+               `order`.addr,
+               `order`.coup,
+               `order`.created_at,
+               `order`.updated_at
+        from `order`
+    </sql>
+
+    <!--根据用户id和状态查询数据-->
+    <select id="findByUserIdAndStatus" resultType="com.example.courses.music.model.Order">
+        <include refid="order_select"></include>
+
+        <where>
+            `order`.user_id = #{data}
+            <if test="status != -1">
+                AND `order`.status = #{status}
+            </if>
+        </where>
+        order by created_at desc
+    </select>
+
+    <!--更新订单状态和第三方订单号-->
+    <update id="updateStatusAndOther">
+        update `order`
+
+        <set>
+            status = #{status},
+            other = #{other}
+        </set>
+
+        where id = #{id}
+    </update>
+
+    <!--查询所有超时的订单-->
+    <select id="findAllByTimeout" resultType="com.example.courses.music.model.Order">
+        <include refid="order_select"></include>
+
+        WHERE
+        NOW() > DATE_ADD(created_at, INTERVAL 15 MINUTE)
+        AND status = 0
+        ORDER BY created_at DESC
+    </select>
+</mapper>

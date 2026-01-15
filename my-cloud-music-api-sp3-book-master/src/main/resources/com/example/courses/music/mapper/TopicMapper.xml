@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"  >
+<mapper namespace="com.example.courses.music.mapper.TopicMapper">
+    <!--视频列表-->
+    <select id="findAll" resultType="com.example.courses.music.model.Topic">
+        SELECT
+        *
+        FROM
+        topic
+        <where>
+            <if test="since != null">
+                id > #{since}
+            </if>
+        </where>
+        ORDER BY id ASC
+        LIMIT #{size}
+    </select>
+</mapper>

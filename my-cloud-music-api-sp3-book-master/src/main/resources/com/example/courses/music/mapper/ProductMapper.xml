@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"  >
+<mapper namespace="com.example.courses.music.mapper.ProductMapper">
+    <!--列表-->
+    <select id="findAll" resultType="com.example.courses.music.model.Product">
+        SELECT
+        *
+        FROM
+        product
+
+        <!--where标签的好处是
+        如果map为空
+        生成的sql他不会有where-->
+        <where>
+            <if test="query != null and query != ''">
+                title like '%${query}%'
+            </if>
+
+            <if test="brands != null and brands.size > 0">
+                and
+                <foreach collection="brands" item="item" separator="or" open="(" close=")">
+                    title like '%${item}%'
+                </foreach>
+            </if>
+        </where>
+
+        order by ${field} ${order}
+    </select>
+</mapper>

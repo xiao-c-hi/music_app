@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"  >
+<mapper namespace="com.example.courses.music.mapper.SongMapper">
+    <!--结果map-->
+    <resultMap id="songResult" autoMapping="true" type="com.example.courses.music.model.Song">
+
+        <!--用户-->
+        <association property="user" resultMap="com.example.courses.music.mapper.UserMapper.user"/>
+
+        <!--歌手-->
+        <association property="singer" javaType="com.example.courses.music.model.User">
+            <id column="singer_id" property="id"/>
+            <result column="singer_nickname" property="nickname"/>
+            <result column="singer_icon" property="icon"/>
+        </association>
+    </resultMap>
+
+    <!--列表，会查询关联数据-->
+    <select id="findAllDetail" resultMap="songResult">
+        select
+        song.id,
+        song.title,
+        song.icon,
+        song.uri,
+        song.clicks_count,
+        song.comments_count,
+        song.created_at,
+        song.updated_at,
+
+        <include refid="com.example.courses.music.mapper.UserMapper.user_column"></include>,
+
+        song.singer_id as singer_id,
+        singer.nickname as singer_nickname,
+        singer.icon as singer_icon
+
+        from song
+        inner join user on song.user_id = user.id
+        inner join user as singer on singer.id = song.singer_id
+        order by song.created_at desc
+        limit 30 offset 0
+    </select>
+
+    <!--查询歌单下的歌曲-->
+    <select id="findAllDetailBySheetId" resultMap="songResult">
+        select
+        song.id,
+        song.title,
+        song.icon,
+        song.uri,
+        song.clicks_count,
+        song.comments_count,
+        song.created_at,
+        song.updated_at,
+
+        <include refid="com.example.courses.music.mapper.UserMapper.user_column"></include>,
+
+        song.singer_id as singer_id,
+        singer.nickname as singer_nickname,
+        singer.icon as singer_icon
+
+        from song
+        inner join user on song.user_id = user.id
+        inner join user as singer on singer.id = song.singer_id
+        where song.id in (select song_id from relation where sheet_id = #{data})
+        order by song.created_at desc
+    </select>
+</mapper>

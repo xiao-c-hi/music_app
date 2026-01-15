@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"  >
+<mapper namespace="com.example.courses.music.mapper.FeedMapper">
+    <!--创建动态-->
+    <insert id="create">
+        <!--生成主键-->
+        <!--        <selectKey keyProperty="id" resultType="java.lang.String" order="BEFORE">-->
+        <!--            <include refid="sql.id"/>-->
+        <!--        </selectKey>-->
+
+        insert into feed(
+            id,
+            content,
+            province,
+            province_code,
+            city,
+            city_code,
+            area,
+            area_code,
+            `position`,
+            address,
+            longitude,
+            latitude,
+            user_id
+        )values (
+            #{id},
+            #{content},
+            #{province},
+            #{provinceCode},
+            #{city},
+            #{cityCode},
+            #{area},
+            #{areaCode},
+            #{position},
+            #{address},
+            #{longitude},
+            #{latitude},
+            #{userId}
+        )
+    </insert>
+
+    <!--结果map-->
+    <resultMap id="feedResult" autoMapping="true" type="com.example.courses.music.model.Feed">
+        <id column="id" property="id"/>
+
+        <!--用户-->
+        <association property="user" resultMap="com.example.courses.music.mapper.UserMapper.user"/>
+
+        <!--图片-->
+        <collection property="medias" ofType="com.example.courses.music.model.Resource">
+            <result column="media_uri" property="uri"/>
+            <result column="media_style" property="style"/>
+        </collection>
+
+        <!--点赞的用户-->
+        <collection property="likes" ofType="com.example.courses.music.model.User">
+            <id column="like_user_id" property="id"/>
+            <result column="like_user_nickname" property="nickname"/>
+            <result column="like_user_icon" property="icon"/>
+        </collection>
+    </resultMap>
+
+    <!--动态列表-->
+    <select id="findAll" resultMap="feedResult">
+        SELECT
+        feed.id,
+        feed.content,
+        feed.province,
+        feed.province_code,
+        feed.city,
+        feed.city_code,
+        feed.area,
+        feed.area_code,
+        feed.position,
+        feed.address,
+        feed.longitude,
+        feed.latitude,
+        feed.created_at,
+        resource.uri AS media_uri,
+        resource.style AS media_style,
+
+        <include refid="com.example.courses.music.mapper.UserMapper.user_column"></include>,
+
+        like_user.id AS like_user_id,
+        like_user.nickname AS like_user_nickname,
+        like_user.icon AS like_user_icon
+        FROM
+        feed
+        LEFT JOIN
+        user ON feed.user_id = user.id
+        LEFT JOIN
+        `like` ON feed.id = `like`.feed_id
+        LEFT JOIN
+        user AS like_user ON `like`.user_id = like_user.id
+        LEFT JOIN
+        resource ON feed.id = resource.feed_id
+        ORDER BY feed.created_at DESC
+    </select>
+
+    <!--删除-->
+    <delete id="deleteByIdAndUserId">
+        delete from feed
+        where id = #{id}
+          and user_id = #{userId}
+    </delete>
+</mapper>

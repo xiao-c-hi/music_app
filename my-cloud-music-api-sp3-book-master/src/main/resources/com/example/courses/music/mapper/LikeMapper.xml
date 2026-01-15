@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"  >
+<mapper namespace="com.example.courses.music.mapper.LikeMapper">
+    <!--查询指定动态所有点赞用户-->
+    <select id="findLikeUserByFeedId" resultType="com.example.courses.music.model.User">
+        SELECT
+            u.id,
+            u.icon,
+            u.nickname
+        FROM
+            `like` l
+                JOIN
+            `user` u
+            ON
+                l.user_id = u.id
+        WHERE
+            l.feed_id = #{feedId}
+    </select>
+</mapper>

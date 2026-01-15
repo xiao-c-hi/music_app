@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"  >
+<mapper namespace="com.example.courses.music.mapper.CouponMapper">
+    <!--返回该金额下可用的优惠券列表、
+    CDATA：这种是特殊字符另一种写法-->
+    <select id="findAllByAvailable" resultType="com.example.courses.music.model.Coupon">
+        SELECT coupon.id,
+               coupon.`expire`,
+               coupon.created_at,
+
+               coupon_activity.id          as "coupon_activity.id",
+               coupon_activity.valid       as "coupon_activity.valid",
+               coupon_activity.title       as "coupon_activity.title",
+               coupon_activity.`start`     as "coupon_activity.start",
+               coupon_activity.`end`       as "coupon_activity.end",
+               coupon_activity.`condition` as "coupon_activity.condition",
+               coupon_activity.price       as "coupon_activity.price"
+        FROM coupon
+                 LEFT JOIN
+             coupon_activity ON coupon.coupon_activity_id = coupon_activity.id
+        where now() &lt; coupon.`expire`
+          and coupon.valid = 0
+          and coupon.used = 0
+          and coupon.user_id = #{userId}
+          and coupon_activity.`condition` <![CDATA[ <= ]]> #{price}
+        order by coupon_activity.created_at desc
+    </select>
+
+    <!--查询该用户的优惠券是否可用-->
+    <select id="findByIdAndUserIdAndValid" resultType="com.example.courses.music.model.Coupon">
+        SELECT coupon.id,
+               coupon.`expire`,
+               coupon.created_at,
+
+               coupon_activity.id          as "coupon_activity.id",
+               coupon_activity.valid       as "coupon_activity.valid",
+               coupon_activity.title       as "coupon_activity.title",
+               coupon_activity.`start`     as "coupon_activity.start",
+               coupon_activity.`end`       as "coupon_activity.end",
+               coupon_activity.`condition` as "coupon_activity.condition",
+               coupon_activity.price       as "coupon_activity.price"
+        FROM coupon
+                 LEFT JOIN
+             coupon_activity ON coupon.coupon_activity_id = coupon_activity.id
+        where now() &lt; coupon.`expire`
+          and coupon.valid = 0
+          and coupon.used = 0
+          and coupon.user_id = #{userId}
+          and coupon.id = #{id}
+        order by coupon_activity.created_at desc
+    </select>
+
+    <!--显示该用户所有优惠券-->
+    <select id="findAll" resultType="com.example.courses.music.model.Coupon">
+        SELECT coupon.id,
+               coupon.`used`,
+               coupon.`valid`,
+               coupon.created_at,
+               coupon.`expire`,
+
+               coupon_activity.id          as "coupon_activity.id",
+               coupon_activity.valid       as "coupon_activity.valid",
+               coupon_activity.title       as "coupon_activity.title",
+               coupon_activity.`start`     as "coupon_activity.start",
+               coupon_activity.`end`       as "coupon_activity.end",
+               coupon_activity.`condition` as "coupon_activity.condition",
+               coupon_activity.price       as "coupon_activity.price"
+        FROM coupon
+                 LEFT JOIN
+             coupon_activity ON coupon.coupon_activity_id = coupon_activity.id
+        where coupon.user_id = #{userId}
+        order by coupon_activity.created_at desc
+    </select>
+
+    <!--更改为已经使用-->
+    <update id="changeUsed">
+        update `coupon`
+
+        <set>
+            used = #{status}
+        </set>
+
+        where id = #{data}
+    </update>
+
+</mapper>

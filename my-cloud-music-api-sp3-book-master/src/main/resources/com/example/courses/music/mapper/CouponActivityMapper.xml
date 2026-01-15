@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"  >
+<mapper namespace="com.example.courses.music.mapper.CouponActivityMapper">
+    <!--查询所有没有失效活动
+    条件写到join里面，表示所有条件为true才关联成功
+    如果写到where是关联成功后再次筛选
+
+    例如：下面的coupon.user_id写到关联条件里面，同时又因为用的left join
+    如果该用户没有参加活动，还是会返回所有活动，只是没有优惠券信息
+
+    如果写到where里面，那只会返回该用户参加的活动
+    DATE_SUB(now(), interval 7 day)：当前日期-7天
+    当然也可以根据优惠券的过期日期判断，这里的写法是，如果没有过期日期，根据创建时间判断
+    注意：但因为数据库中创建日期是数据库赋值的，而过期日期是代码中计算的，所以可能有毫秒级别的差距
+    -->
+    <select id="findAllByValid" resultType="com.example.courses.music.model.CouponActivity">
+        SELECT coupon_activity.id,
+               coupon_activity.valid,
+               coupon_activity.title,
+               coupon_activity.`start`,
+               coupon_activity.`end`,
+               coupon_activity.`condition`,
+               coupon_activity.price,
+               coupon_activity.detail,
+               coupon_activity.quantity,
+
+               coupon.id         as coupon_id,
+               coupon.created_at as coupon_created_at
+        FROM coupon_activity
+                 LEFT JOIN
+             coupon ON coupon_activity.id = coupon.coupon_activity_id
+                 and DATE_SUB(now(), interval 500 day) &lt; coupon.created_at
+                 and coupon.user_id = ${data}
+                 and coupon.valid = 0
+                 and coupon.used = 0
+        where now() &lt; coupon_activity.`end`
+        order by coupon_activity.created_at desc;
+    </select>
+</mapper>

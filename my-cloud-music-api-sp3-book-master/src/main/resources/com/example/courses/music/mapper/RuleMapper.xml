@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"  >
+<mapper namespace="com.example.courses.music.mapper.RuleMapper">
+    <!--查询结果-->
+    <resultMap id="result" autoMapping="true" type="com.example.courses.music.model.Rule">
+        <id column="id" property="id"/>
+        <id column="title" property="title"/>
+        <id column="name" property="name"/>
+        <id column="value" property="value"/>
+        <id column="icon" property="icon"/>
+        <id column="path" property="path"/>
+        <id column="uri" property="uri"/>
+        <id column="method" property="method"/>
+        <id column="condition" property="condition"/>
+        <id column="status" property="status"/>
+        <id column="sort" property="sort"/>
+
+        <!--子列表-->
+        <collection property="children" ofType="com.example.courses.music.model.Rule">
+            <id column="two.id" property="id"/>
+            <id column="two.title" property="title"/>
+            <id column="two.name" property="name"/>
+            <id column="two.value" property="value"/>
+            <id column="two.icon" property="icon"/>
+            <id column="two.path" property="path"/>
+            <id column="two.uri" property="uri"/>
+            <id column="two.method" property="method"/>
+            <id column="two.condition" property="condition"/>
+            <id column="two.status" property="status"/>
+            <id column="two.sort" property="sort"/>
+
+        </collection>
+    </resultMap>
+
+    <select id="findAll" resultMap="result">
+        SELECT
+            rule.id,
+            rule.title,
+            rule.name,
+            rule.value,
+            rule.icon,
+            rule.path,
+            rule.uri,
+            rule.method,
+            rule.condition,
+            rule.status,
+            rule.show,
+            rule.sort,
+            two.id AS 'two.id',
+            two.title AS 'two.title',
+            two.name AS 'two.name',
+            two.icon AS 'two.icon',
+            two.jump AS 'two.jump',
+            two.uri AS 'two.uri',
+            two.method AS 'two.method',
+            two.condition AS 'two.condition',
+            two.status AS 'two.status',
+            two.show AS 'two.show',
+            two.sort AS 'two.sort'
+        FROM
+            `rule`
+                LEFT JOIN
+            `rule` AS two ON two.parent_id = rule.id
+                LEFT JOIN
+            `rule` AS three ON three.parent_id = two.id
+        <where>
+            rule.parent_id IS NULL
+          AND rule.status = 0
+          AND two.status = 0
+          AND three.status = 0
+
+            <if test="datum != null and datum.size > 0">
+                AND three.name in
+                <foreach collection="datum" item="data" open="(" separator="," close=")">
+                    #{data}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY rule.sort ASC , two.sort ASC , three.sort ASC
+    </select>
+</mapper>

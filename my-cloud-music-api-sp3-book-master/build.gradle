@@ -1,0 +1,179 @@
+plugins {
+    id 'org.springframework.boot' version '2.6.0'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+group = 'com.ixuea.courses'
+version = '2.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+//jar配置
+bootJar{
+    //jar名称
+    //将文件名称设置为固定值
+    //好处是在run.sh中直接用就行了
+    archiveFileName = "music_api_sp3.jar"
+}
+
+repositories {
+    //加速仓库
+//    https://developer.aliyun.com/mvn/guide
+//   maven { url 'https://maven.aliyun.com/repository/public' }
+//   maven { url 'https://maven.aliyun.com/repository/google' }
+//   maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+//   maven { url 'https://maven.aliyun.com/repository/spring' }
+//   maven { url 'https://maven.aliyun.com/repository/spring-plugin' }
+
+    mavenCentral()
+}
+
+dependencies {
+    //web框架
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    //我们主要使用BCryptPasswordEncoder
+    //spring-boot-starter-security中就引用了
+    //但我们不使用spring-boot-starter-security
+    //所以就单独引用这个包
+    implementation 'org.springframework.security:spring-security-core:5.7.5'
+
+    //从Spring Boot 2.3开始，web框架中移除了validator，所以要添加手动添加
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    //region 数据库相关
+    //提示：region这种语法是最新的，推荐使用这种，也更容易阅读，不建议在同一个文件同时使用
+    //因为可能会显示出错
+    //mysql数据库驱动
+    //因为我们使用了MySQL，所以添加MySQL驱动
+    //如果大家使用其他数据库，只需要换成其他数据库对应的驱动
+    runtimeOnly 'mysql:mysql-connector-java'
+
+    //用来增强mybatis
+    //https://mp.baomidou.com/guide/quick-start.html
+    implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.7'
+
+    //MyBatis通用分页插件，可以直接使用MyBatis Plus分页
+    //通过aop方法拦截sql，然后添加分页参数
+    //https://github.com/pagehelper/pagehelper-spring-boot
+    implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:2.1.0'
+    //endregion
+
+    //常用加密算法工具类
+    //https://commons.apache.org/proper/commons-codec/
+    implementation 'commons-codec:commons-codec:1.15'
+
+    //权限管理框架
+    //http://sa-token.dev33.cn/doc/index.html#/start/download
+    implementation 'cn.dev33:sa-token-spring-boot-starter:1.28.0'
+
+    //Sa-Token整合redis (使用jackson序列化方式)
+    implementation 'cn.dev33:sa-token-dao-redis-jackson:1.20.0'
+
+    //模板框架
+    //如果是做web开发，用该框架比较多
+    //我们主要实现邮件模板
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    //发送邮件
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    //阿里云新版通用sdk
+    //基本上可以调用所有服务
+    //https://help.aliyun.com/document_detail/112148.html
+    implementation 'com.aliyun:aliyun-java-sdk-core:0.2.11-bate'
+
+    //阿里云STS SDK
+    //用来生成临时访问阿里云服务token
+    //我们这里用他生成临时oos token返回给客户端
+    //可视化使用临时token上传文件到oss
+    //https://help.aliyun.com/document_detail/28786.html
+    implementation 'com.aliyun:aliyun-java-sdk-sts:3.1.2'
+    implementation 'com.aliyun:aliyun-java-sdk-core:4.7.1'
+
+    //阿里云OSS
+    //用来在服务端操作阿里云OSS
+    //我们这里目前来说并没有直接操作oss
+    //所以可以不用集成
+    //集成的目的是给大家讲解下
+    //https://help.aliyun.com/document_detail/32009.html
+    implementation 'com.aliyun.oss:aliyun-sdk-oss:3.18.1'
+
+    //验证码框架
+    //https://github.com/whvcse/EasyCaptcha
+    implementation 'com.github.whvcse:easy-captcha:1.6.2'
+
+    //apache common lang3工具包
+    //提供了StringUtils等这样的类
+    //http://commons.apache.org/proper/commons-lang/
+    implementation 'org.apache.commons:commons-lang3:3.16.0'
+
+    //redis依赖commons-pool
+    //一定要添加
+    implementation 'org.apache.commons:commons-pool2'
+
+    //集合工具类
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
+    implementation 'org.apache.commons:commons-collections4:4.5.0-M2'
+
+    //User Agent解析框架
+    //https://yauaa.basjes.nl/README-Usage.html
+    implementation 'nl.basjes.parse.useragent:yauaa:7.26.1'
+
+    //融云IM
+    //https://github.com/rongcloud/server-sdk-java
+    implementation 'cn.rongcloud.im:server-sdk-java:3.2.12'
+
+    //腾讯云sdk
+    //https://cloud.tencent.com/document/product/1110/36926
+    implementation 'com.tencentcloudapi:tencentcloud-sdk-java:3.1.1085'
+
+    //阿里云互动直播
+    //什么是互动直播：基于视频直播、音视频通信RTC、视频点播、IM、白板和美颜等原子能力进行场景化组合的解决方案，可为您提供电商、秀场、企业培训、社交交友和语聊房等多种场景下的场景化直播方案
+    //https://help.aliyun.com/document_detail/270125.html
+    implementation 'com.aliyun:tea-openapi:0.1.0'
+    implementation 'com.aliyun:imp20210630:2.0.0'
+
+    //百度AI SDK，这里主要用来识别收货地址文本
+    //https://github.com/Baidu-AIP/java-sdk
+    implementation('com.baidu.aip:java-sdk:4.16.19'){
+        //排除该sdk依赖的slf4j依赖，不然会和项目中其他sdk引用的旧版slf4j冲突
+        exclude group: 'org.slf4j'
+    }
+
+    //支付宝
+    //https://docs.open.alipay.com/54/106370
+    implementation 'com.alipay.sdk:alipay-sdk-java:4.34.71.ALL'
+
+    //Hutool是一个小而全的Java工具类库
+    // 通过静态方法封装，降低相关API的学习成本
+    // 提高工作效率，使Java拥有函数式语言般的优雅
+    //https://github.com/looly/hutool
+    implementation 'cn.hutool:hutool-all:5.7.14'
+
+    //region elasticsearch
+    //通过Java High Level REST Client sdk使用elasticsearch，版本必须和es一样
+    //https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high-getting-started-maven.html
+    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.15.1'
+
+    //上面依赖 依赖这个
+    implementation 'org.elasticsearch:elasticsearch:7.15.1'
+    //endregion
+
+    //极光推送
+    //用来实现用户实时挤掉
+    //https://github.com/jpush/jpush-api-java-client
+    implementation 'cn.jpush.api:jpush-client:3.5.5'
+
+    //微信开放平台
+    //https://github.com/Wechat-Group/WxJava
+    implementation 'com.github.binarywang:weixin-java-open:4.4.6.B'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,100 @@
+#通用配置
+info:
+  #版本
+  version:
+    name: 1.0.0
+    code: 100
+  #当前应用地址（本地测试）
+  host: ${HOST:http://localhost:8080}
+  # 项目名称
+  name: my-music-api
+
+spring:
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      max-file-size: 10MB  # 放宽单文件上传限制
+      max-request-size: 50MB
+  mvc:
+    throw-exception-if-no-handler-found: true  # 打开404抛异常，方便调试
+  # redis配置
+  redis:
+    namespace: ${REDIS_NAMESPACE:my_music_api:}
+    database: 0
+    host: ${REDIS_HOST:127.0.0.1}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:YOUR_REDIS_PASSWORD}  # 替换为Redis密码占位符
+    timeout: 1000ms
+    lettuce:
+      pool:
+        max-active: 200
+        max-wait: -1ms
+        max-idle: 10
+        min-idle: 0
+  #数据源配置（本地MySQL）
+  datasource:
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/music?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai}
+    username: ${DATABASE_USERNAME:YOUR_MYSQL_USERNAME}  # 替换为MySQL用户名占位符
+    password: ${DATABASE_PASSWORD:YOUR_MYSQL_PASSWORD}  # 替换为MySQL密码占位符
+  #jackson配置
+  jackson:
+    default-property-inclusion: non_null
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSXXX
+    time-zone: UTC
+  #邮件配置
+  mail:
+    host: smtp.qq.com
+    username: YOUR_EMAIL_ACCOUNT  # 替换为邮箱账号占位符
+    password: YOUR_EMAIL_AUTH_CODE  # 替换为邮箱授权码占位符
+    default-encoding: utf-8
+  web:
+    resources:
+      add-mappings: false
+
+# sa-token配置
+sa-token:
+  is-read-cookie: false
+  token-name: authorization
+  activity-timeout: 604800
+  is-concurrent: false
+  is-share: false
+  is-log: true
+
+#mybatis-plus配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:com/example/courses/music/mapper/*.xml
+
+# 以下第三方服务
+chat:
+  key: YOUR_CHAT_KEY  # 替换为聊天服务Key占位符
+  secret: YOUR_CHAT_SECRET  # 替换为聊天服务Secret占位符
+
+aliyun:
+  key: YOUR_ALIYUN_ACCESS_KEY_ID  # 替换为阿里云AccessKey ID占位符
+  secret: YOUR_ALIYUN_ACCESS_KEY_SECRET  # 替换为阿里云AccessKey Secret占位符
+  sms:
+    region: cn-beijing
+  oss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+  sts:
+    endpoint: sts.aliyuncs.com
+    role: acs:ram::YOUR_ALIYUN_ACCOUNT_ID:role/music  # 替换为阿里云账号ID占位符
+#  live:
+#    key: YOUR_ALIYUN_LIVE_KEY  # 替换为阿里云直播Key占位符
+#    secret: YOUR_ALIYUN_LIVE_SECRET  # 替换为阿里云直播Secret占位符
+
+alipay:
+  id: YOUR_ALIPAY_APP_ID  # 替换为支付宝AppID占位符
+  private: YOUR_ALIPAY_PRIVATE_KEY  # 替换为支付宝私钥占位符
+  appCertPath: data/alipay/appCertPublicKey.crt
+  alipayCertPath: data/alipay/alipayCertPublicKey_RSA2.crt
+  alipayRootCertPath: data/alipay/alipayRootCert.crt
+  public: YOUR_ALIPAY_PUBLIC_KEY  # 替换为支付宝公钥占位符
+
+push:
+  key: YOUR_PUSH_APP_KEY  # 替换为推送服务AppKey占位符
+  secret: YOUR_PUSH_APP_SECRET  # 替换为推送服务AppSecret占位符
+
